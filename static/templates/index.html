@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Control Interface</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#1c1c1c',
+            muted: '#2a2a2a',
+            'muted-foreground': '#a0a0a0',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-background text-white">
+  <div class="flex flex-col h-screen w-full bg-background">
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <!-- Left Sidebar -->
+      <div class="bg-muted/40 border-r border-muted flex-shrink-0 w-full lg:w-[220px] p-4 overflow-y-auto">
+        <div id="cameraButtons" class="flex flex-col gap-2">
+            <!-- Camera buttons will be inserted here -->
+            
+          </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="flex-grow flex justify-center items-center p-4">
+        <div class="relative w-full h-0 pb-[56.25%] max-w-[1280px] max-h-[720px]">
+          <video id="video" autoplay="true" playsinline="true" class="absolute top-0 left-0 w-full h-full object-contain"></video>
+        </div>
+      </div>
+            
+      <!-- Right Sidebar -->
+      <div class="bg-muted/40 border-l border-muted flex-shrink-0 w-full lg:w-[220px] p-4 overflow-y-auto">
+        <div class="text-center font-medium mb-2">PTZ Control</div>
+        <div class="grid grid-cols-3 w-fit mx-auto">
+            <!-- Up Left -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(-1,1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-up-left-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Up -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(-0,1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-up-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Up Right -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(1,1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-up-right-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Left -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(-1,0,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-left-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Center (empty) -->
+            <div class="h-10 w-10"></div>
+            <!-- Right -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(1,0,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-right-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Down Left -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(-1,-1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-down-left-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Down -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(0,-1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-down-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+            <!-- Down Right -->
+            <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+            onmousedown="ptzMove(1,-1,0)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+                <i class="bi bi-arrow-down-right-square text-muted-foreground" style="font-size: 1.5rem;"></i>
+            </button>
+        </div>
+        
+        <!-- Zoom Element -->
+<div class="grid grid-cols-3 w-fit mx-auto mt-2">
+  <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+  onmousedown="ptzMove(0,0,1)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+      <i class="bi bi-zoom-in text-muted-foreground" style="font-size: 1.5rem;"></i>
+  </button>
+  <div class="h-10 w-10"></div>
+  <button class="flex items-center justify-center text-sm font-medium hover:bg-muted h-10 w-10 -m-px opacity-50 pointer-events-none"
+  onmousedown="ptzMove(0,0,-1)" onmouseup="ptzStop()" onmouseleave="ptzStop()">
+      <i class="bi bi-zoom-out text-muted-foreground" style="font-size: 1.5rem;"></i>
+  </button>
+</div>
+
+<!-- Presets -->
+<div class="mt-4">
+  <div class="text-center font-medium mb-2">Presets</div>
+  <div id="preset-container"></div>
+</div>
+      </div>
+    </div>
+  </div>
+
+<!-- Popup -->
+<div id="popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3 text-center">
+          <h3 class="text-lg leading-6 font-medium text-gray-900" id="popup-message"></h3>
+          <div class="mt-2 px-7 py-3">
+              <button id="close-popup" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                 onmousedown="closePopup()">
+                 Close </button>
+          </div>
+      </div>
+  </div>
+</div>
+</body>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
+
