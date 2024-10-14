@@ -29,8 +29,26 @@
       <div class="bg-muted/40 border-r border-muted flex-shrink-0 w-full lg:w-[220px] p-4 overflow-y-auto">
         <div id="cameraButtons" class="flex flex-col gap-2">
             <!-- Camera buttons will be inserted here -->
-            
-          </div>
+            <!-- Add the OPF 1 camera button -->
+            <div class="flex flex-col items-start">
+              <button id="OPF1-button" onclick="connectStream('OPF 1')" class="flex items-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-muted h-10 px-4 py-2 justify-start gap-2 w-full">
+                <i class="bi bi-camera"></i>
+                <span id="OPF1-name">OPF 1</span>
+              </button>
+              <div id="OPF1-status" class="text-xs text-gray-500 mt-1 ml-2">
+                Viewer(s): <span id="OPF1-viewers">0</span> | Status: <span id="OPF1-health">true</span>
+              </div>
+            </div>
+            <div class="flex flex-col items-start">
+              <button id="OPF1-button" onclick="connectStream('OPF 2')" class="flex items-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-muted h-10 px-4 py-2 justify-start gap-2 w-full">
+                <i class="bi bi-camera"></i>
+                <span id="OPF1-name">OPF 2</span>
+              </button>
+              <div id="OPF1-status" class="text-xs text-gray-500 mt-1 ml-2">
+                Viewer(s): <span id="OPF1-viewers">0</span> | Status: <span id="OPF1-health">true</span>
+              </div>
+            </div>
+        </div>
       </div>
 
       <!-- Main Content Area -->
@@ -128,4 +146,3 @@
 <script type="module" src="main.js"></script>
 </body>
 </html>
-

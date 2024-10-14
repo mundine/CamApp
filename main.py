@@ -5,23 +5,27 @@ from typing import Dict
 
 # Third-party imports
 import asyncio
-from asyncio import AbstractEventLoop
 
 # Local application imports
-from app.app import App
+
+from connection.connection_manager import ConnectionManager
 from server.server import Server
 from config import Cameras
+from utils.logger import get_logger
 
-# Setup signal handlers
-def signal_handler(loop: AbstractEventLoop):
-    loop.stop()
+# Import Logger
+logger = get_logger(__name__)
 
-async def setup_cameras(app: App, cameras: Dict):
+def signal_handler(signum, frame):
+    logger.info(f"Received signal {signum}. Shutting down...")
+    sys.exit(0)
+
+async def setup_cameras(app: ConnectionManager, cameras: Dict):
     for id, camera_info in cameras.items():
         await app.add_camera(id, camera_info)
 
 def main():
-    app = App()
+    app = ConnectionManager()
     server = Server(app)
     
     loop = asyncio.new_event_loop()
@@ -30,11 +34,19 @@ def main():
     loop.run_until_complete(server.setup())
     loop.run_until_complete(setup_cameras(app, Cameras))
     
-    if sys.platform == "win32":
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            signal.signal(sig, lambda s, f: signal_handler(loop))
+    # Set up signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     
-    server.run(host="0.0.0.0", port=5000)
+    try:
+        logger.info("Starting server...")
+        server.run(host="0.0.0.0", port=5000)
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received. Shutting down...")
+    finally:
+        logger.info("Cleaning up...")
+        loop.run_until_complete(server.shutdown())
+        loop.close()
 
 if __name__ == "__main__":
     main()

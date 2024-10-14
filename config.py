@@ -49,6 +49,6 @@ Cameras = {
         'password': OPF2_PASS,
         'ip': '10.29.32.68',
         'ptz_port': 80,
-        'rtsp_port': 554,
+        'rtsp_port': 555,
     }
 }

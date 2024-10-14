@@ -5,9 +5,10 @@ import { ptzMove, ptzStop, ptzGotoPreset, ptzGetPresets } from './ptz_control.js
 
 document.addEventListener('DOMContentLoaded', function() {
     createConnection();
-   });
+});
 
-
+// Make functions available globally
+window.connectStream = connectStream;
 window.ptzMove = ptzMove;
 window.ptzStop = ptzStop;
 window.ptzGotoPreset = ptzGotoPreset;

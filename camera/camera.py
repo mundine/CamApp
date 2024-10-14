@@ -1,17 +1,17 @@
 # Standard Library Imports
-from typing import Optional, Set, Dict
+from typing import Optional, Dict
 from concurrent.futures import ThreadPoolExecutor
+import asyncio
+import av
+import logging
 
 #Third Party Imports    
 from aiortc import MediaStreamTrack
 from aiortc.contrib.media import MediaRelay, MediaPlayer
-import asyncio
-import av
 
 #Local Application Imports
-from client.client import Client
 from controller.controller import CameraController
-from camera.cameraconfig import CameraConfig, CameraState  
+from camera.camera_config import CameraConfig, CameraState  
 
 class Camera:
     def __init__(self, camera_name: str, camera_data: Dict[str, str]):
@@ -20,38 +20,41 @@ class Camera:
         self.state = CameraState.OFFLINE
         self.player: Optional[MediaStreamTrack] = None
         self.relay: Optional[MediaRelay] = None
-        self.connected_clients: Set[Client] = set()
+        self.clients: int = 0
         self.executor: ThreadPoolExecutor = ThreadPoolExecutor(max_workers=5)
         self.controller: Optional[CameraController] = None
 
     async def start(self):
         try:
-            player = await asyncio.to_thread(MediaPlayer, self.config.rtsp_url, format="rtsp", timeout=5)
+            player = await asyncio.wait_for(
+                asyncio.to_thread(MediaPlayer, self.config.rtsp_url, format="rtsp"),
+                timeout=10
+            )
             self.player = player.video
             self.relay = MediaRelay()
             self.state = CameraState.ONLINE
             self.controller = CameraController(self.config)
-        except av.error.ExitError: 
+        except asyncio.TimeoutError:
+            logging.error(f"Timeout while connecting to camera {self.name}")
+            self.state = CameraState.UNAVAILABLE
+        except av.error.ExitError as e:
+            logging.error(f"ExitError for camera {self.name}: {str(e)}")
+            await self.stop()
+            self.state = CameraState.UNAVAILABLE
+        except Exception as e:
+            logging.error(f"Unexpected error starting camera {self.name}: {str(e)}")
             await self.stop()
             self.state = CameraState.UNAVAILABLE
 
     async def stop(self):
+        self.state = CameraState.OFFLINE
         if self.player:
             await asyncio.to_thread(self.player.stop)
         self.player = None
         self.relay = None
         self.controller = None
-        self.state = CameraState.OFFLINE
 
-    async def add_client(self, client: Client):
-        self.connected_clients.add(client)
-        if len(self.connected_clients) == 1:
-            await self.start()
 
-    async def remove_client(self, client: Client):
-        self.connected_clients.remove(client)
-        if len(self.connected_clients) == 0:
-            await self.stop()
 
     async def __aenter__(self):
         await self.start()

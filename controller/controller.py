@@ -5,7 +5,7 @@ from datetime import timedelta
 from onvif import ONVIFCamera
 
 # Local Application Imports
-from camera.cameraconfig import CameraConfig
+from camera.camera_config import CameraConfig
 
 class CameraController:
     def __init__(self, config: CameraConfig) -> None:
