@@ -2,8 +2,10 @@
 from typing import Optional, Dict
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
+import socket
 import av
 import logging
+from urllib.parse import urlparse
 
 #Third Party Imports    
 from aiortc import MediaStreamTrack
@@ -54,7 +56,20 @@ class Camera:
         self.relay = None
         self.controller = None
 
-
+    async def check_health(self):
+            parsed_url = urlparse(self.config.rtsp_url)
+            host = parsed_url.hostname
+            port = parsed_url.port or 554
+            
+            try:
+                _, _ = await asyncio.wait_for(
+                    asyncio.open_connection(host, port),
+                    timeout=1.0
+                )
+                self.state = CameraState.OFFLINE
+            except (asyncio.TimeoutError, ConnectionRefusedError, socket.gaierror):
+                self.state = CameraState.UNAVAILABLE
+   
 
     async def __aenter__(self):
         await self.start()

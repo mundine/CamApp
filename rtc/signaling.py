@@ -1,24 +1,25 @@
 # Standard library imports
 import uuid
+import json
 
 # Third-party imports
 from aiohttp import web
 from aiortc import RTCSessionDescription
 
 # Local application imports
-from connection.connection_manager import ConnectionManager
+from app_state import AppState
 from .peer_connection import CustomRTCPeerConnection
 
-def create_offer_handler(app: ConnectionManager):
+def create_offer_handler(app: AppState):
     async def offer(request):
         params = await request.json()
         pc = CustomRTCPeerConnection()
         pc.client_id = str(uuid.uuid4())
         stream = params.get('stream')
-
+        print(stream)
         if stream:
             try:
-                await app.connect_peer_to_camera(pc, stream)
+                await app.connection_manager.connect_peer_to_camera(pc, stream)
             except ValueError as e:
                 pass
         
@@ -36,9 +37,20 @@ def create_offer_handler(app: ConnectionManager):
     
         @pc.on("datachannel")
         async def on_datachannel(channel):
-            app.clients[pc.client_id].datachannel = channel
-            await app.send_camera_data(pc)
-            await app.send_initial_status(pc)
+            client = app.clients[pc.client_id]
+            client.datachannel = channel
+            await app.send_initial_data(client)
+
+            @channel.on("message")
+            def on_message(message):
+                try:
+                    data = json.loads(message)
+                    print(data)
+                    if data['type'] == 'ptz':
+                        print("hello?")
+                        app.cameras[data['active_camera']].controller.handle_ptz_command(data, pc)
+                except json.JSONDecodeError:
+                    print("Error decoding message")
 
         return web.json_response({
             "sdp": pc.localDescription.sdp,

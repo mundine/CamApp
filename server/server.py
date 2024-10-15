@@ -7,7 +7,7 @@ from collections import defaultdict
 from aiohttp import web
 
 # Local application imports
-from connection.connection_manager import ConnectionManager
+from app_state import AppState
 from server.routes import index, javascript, static_files
 from rtc.signaling import create_offer_handler
 from utils.logger import get_logger
@@ -31,11 +31,12 @@ class RateLimiter:
         return True
 
 class Server:
-    def __init__(self, app: ConnectionManager):
+    def __init__(self, app: AppState):
         self.web_app = web.Application()
         self.app = app
         self.process_connections_task = None
-        self.rate_limiter = RateLimiter(rate_limit=10, time_period=3)  # 10 requests per second
+        self.rate_limiter = RateLimiter(rate_limit=15, time_period=3)  # 15 requests per 3 seconds
+        self.heartbeat_task = None
 
     async def setup(self):
         self.web_app.router.add_get("/", index)
@@ -67,16 +68,18 @@ class Server:
 
     async def start_background_tasks(self, app):
         logger.info("Starting background tasks")
-        self.process_connections_task = asyncio.create_task(self.app.process_connections())
+        self.process_connections_task = asyncio.create_task(self.app.connection_manager.process_connections())
+        self.heartbeat_task = asyncio.create_task(self.app.start_heartbeat())
 
     async def cleanup_background_tasks(self, app):
         logger.info("Cleaning up background tasks")
-        if self.process_connections_task:
-            self.process_connections_task.cancel()
-            try:
-                await self.process_connections_task
-            except asyncio.CancelledError:
-                pass
+        for task in [self.process_connections_task, self.heartbeat_task]:
+            if task:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
 
     def run(self, host: str, port: int):
         logger.info(f"Starting server on {host}:{port}")

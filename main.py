@@ -7,8 +7,7 @@ from typing import Dict
 import asyncio
 
 # Local application imports
-
-from connection.connection_manager import ConnectionManager
+from app_state import AppState
 from server.server import Server
 from config import Cameras
 from utils.logger import get_logger
@@ -20,12 +19,12 @@ def signal_handler(signum, frame):
     logger.info(f"Received signal {signum}. Shutting down...")
     sys.exit(0)
 
-async def setup_cameras(app: ConnectionManager, cameras: Dict):
+async def setup_cameras(app: AppState, cameras: Dict):
     for id, camera_info in cameras.items():
         await app.add_camera(id, camera_info)
 
 def main():
-    app = ConnectionManager()
+    app = AppState()
     server = Server(app)
     
     loop = asyncio.new_event_loop()
