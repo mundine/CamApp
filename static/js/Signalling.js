@@ -10,7 +10,10 @@ export class SignallingManager {
 
     createConnection() {
         this.peerConnection = new RTCPeerConnection();
+        // Always create a data channel
         this.dataChannel = this.peerConnection.createDataChannel("comms");
+        this.setupDataChannelListeners();
+
         this.peerConnection.addTransceiver('video', { direction: 'recvonly' });
 
         this.peerConnection.createOffer()
@@ -36,33 +39,11 @@ export class SignallingManager {
         this.initializeEventListeners();
     }
 
-    connectStream(url) {
-        this.streamLocal = url;
-        console.log(this.streamLocal);
-        this.peerConnection.close();
-        this.createConnection();
-    }
-
-    initializeEventListeners() {
-        console.log("Initializing event listeners");
-        console.log(this.peerConnection.dataChannel)
-        this.peerConnection.addEventListener("track", (e) => {
-            console.log("Track");
-            document.getElementById('video').srcObject = e.streams[0];
-        });
-
-        this.peerConnection.onconnectionstatechange = (e) => {
-            console.log("Connection state: " + this.peerConnection.connectionState);
-            if (this.peerConnection.connectionState === 'failed') {
-                console.log("Connection closed. Attempting to reconnect...");
-                setTimeout(() => this.createConnection(), 5000);
-            }
-        };
-
+    setupDataChannelListeners() {
         this.dataChannel.onopen = (e) => {
             console.log("Data channel is open");
             if (this.streamLocal) {
-                console.log("tt")
+                console.log("Requesting presets");
                 this.ptzController.getPresets();
             }
         };
@@ -91,11 +72,37 @@ export class SignallingManager {
         };
     }
 
+    connectStream(url) {
+        this.streamLocal = url;
+        console.log("Connecting to stream:", this.streamLocal);
+        if (this.peerConnection) {
+            this.peerConnection.close();
+        }
+        this.createConnection();
+    }
+
+    initializeEventListeners() {
+        console.log("Initializing event listeners");
+        console.log(this.peerConnection.dataChannel)
+        this.peerConnection.addEventListener("track", (e) => {
+            console.log("Track");
+            document.getElementById('video').srcObject = e.streams[0];
+        });
+
+        this.peerConnection.onconnectionstatechange = (e) => {
+            console.log("Connection state: " + this.peerConnection.connectionState);
+            if (this.peerConnection.connectionState === 'failed') {
+                console.log("Connection closed. Attempting to reconnect...");
+                setTimeout(() => this.createConnection(), 5000);
+            }
+        };
+    }
+
     handleHeartbeatMessage(message) {
         if (message.type === 'heartbeat') {
             const data = message.data;
             for (const [cameraName, cameraData] of Object.entries(data)) {
-                this.cameraManager.updateCameraStatus(cameraName, cameraData.viewers, cameraData.health);
+                this.cameraManager.updateCameraStatus(cameraName, cameraData.clients, cameraData.status);
             }
         }
     }

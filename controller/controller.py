@@ -8,7 +8,7 @@ from onvif import ONVIFCamera
 
 # Local Application Imports
 from camera.camera_config import CameraConfig
-from rtc.peer_connection import CustomRTCPeerConnection
+from client.client import ClientData
 
 class CameraController:
     def __init__(self, config: CameraConfig) -> None:
@@ -19,8 +19,7 @@ class CameraController:
         self.token = self.profile.token
 
 
-    def handle_ptz_command(self, command: Dict, peer_connection: CustomRTCPeerConnection) -> None:
-        print("y")
+    def handle_ptz_command(self, command: Dict, client: ClientData) -> None:
         if command['command'] == 'move':
             self.move(command['x'], command['y'], command['zoom'])
         elif command['command'] == 'stop':
@@ -28,9 +27,8 @@ class CameraController:
         elif command['command'] == 'goto_preset':
             self.goto_preset(command['preset'])
         elif command['command'] == 'get_presets':
-            print("he")
             presets = self.get_presets()
-            peer_connection.datachannel.send(json.dumps({'type': 'presets', 'data': presets}))
+            client.datachannel.send(json.dumps({'type': 'presets', 'data': presets}))
 
     def move(self, x: float, y: float, zoom: float) -> None:
         request = self.ptz_service.create_type('ContinuousMove')

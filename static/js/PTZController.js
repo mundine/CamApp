@@ -1,22 +1,45 @@
 export default class PTZController {
     constructor(connectionManager) {
         this.connectionManager = connectionManager;
+        this.activeCamera = null;
+    }
+
+    setActiveCamera(cameraName) {
+        this.activeCamera = cameraName;
     }
 
     move(x, y, zoom) {
-        this.connectionManager.dataChannel.send(JSON.stringify({type: 'ptz', command: "move", x, y, zoom}));
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "move",
+            camera: this.activeCamera,
+            x, y, zoom
+        }));
     }
 
     stop() {
-        this.connectionManager.dataChannel.send(JSON.stringify({type: 'ptz', command: "stop"}));
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "stop",
+            camera: this.activeCamera
+        }));
     }
 
     gotoPreset(preset) {
-        this.connectionManager.dataChannel.send(JSON.stringify({type: 'ptz', command: "goto_preset", preset}));
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "goto_preset",
+            camera: this.activeCamera,
+            preset
+        }));
     }
 
     getPresets() {
-        this.connectionManager.dataChannel.send(JSON.stringify({type: 'ptz', command: "get_presets"}));
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "get_presets",
+            camera: this.activeCamera
+        }));
     }
 
     enable(en) {

@@ -27,7 +27,6 @@ export default class CameraManager {
         const viewersElement = document.getElementById(`${cameraName}-viewers`);
         const healthElement = document.getElementById(`${cameraName}-health`);
         const buttonElement = document.getElementById(`${cameraName}-button`);
-        
         if (viewersElement) {
             viewersElement.textContent = viewers;
         }

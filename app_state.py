@@ -84,7 +84,8 @@ class AppState:
         camera_info_message = json.dumps({'type': 'camera_info', 'data': self.camera_data})
         heartbeat_message = json.dumps({'type': 'heartbeat', 'data': self.status_data})
         
-        await asyncio.gather(
-            self.send_message_to_client(client, camera_info_message),
-            self.send_message_to_client(client, heartbeat_message)
-        )
+        try:
+            client.datachannel.send(camera_info_message)
+            client.datachannel.send(heartbeat_message)
+        except Exception as e:
+            print(f"Error sending initial data to client {client.peer_connection.client_id}: {str(e)}")
