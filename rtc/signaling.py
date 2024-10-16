@@ -38,8 +38,7 @@ def create_offer_handler(app: AppState):
                     data = json.loads(message)
                     print(f"Received message: {data}")
                     if data['type'] == 'ptz':
-                        client = app.clients[pc.client_id]
-                        result = app.cameras[data['camera']].controller.handle_ptz_command(data, client)
+                        result = app.camera_manager.cameras[data['camera']].controller.handle_ptz_command(data)
                         if result:
                             channel.send(json.dumps(result))
                         

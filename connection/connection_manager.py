@@ -2,6 +2,7 @@ from rtc.peer_connection import CustomRTCPeerConnection
 import asyncio
 from camera.camera_config import CameraState
 
+
 class ConnectionManager:
     def __init__(self, appstate):
         self.connection_queue: asyncio.Queue = asyncio.Queue()
@@ -14,7 +15,7 @@ class ConnectionManager:
 
     async def connect_client_to_camera(self, peer_connection: CustomRTCPeerConnection):
         camera_id = peer_connection.camera_id
-        camera = self.appstate.cameras[camera_id]
+        camera = self.appstate.camera_manager.cameras[camera_id]
     
         if camera.state == CameraState.OFFLINE:
             await camera.start()

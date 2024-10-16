@@ -34,4 +34,4 @@ class CameraManager:
         }.get(camera.state, 'Unknown')
     
     def send_camera_names(self):
-        return json.dumps({'type': 'camera_names', 'data': list(self.cameras.keys())})
+        return json.dumps({'type': 'camera_info', 'data': list(self.cameras.keys())})
