@@ -41,6 +41,7 @@ root_logger.addHandler(console_handler)
 logging.getLogger('aioice').setLevel(logging.WARNING)
 logging.getLogger('aiohttp').setLevel(logging.WARNING)
 logging.getLogger('aiortc').setLevel(logging.ERROR)
+logging.getLogger('ffmpeg').setLevel(logging.CRITICAL)
 
 def get_logger(name):
     """

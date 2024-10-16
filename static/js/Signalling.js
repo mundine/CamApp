@@ -54,10 +54,6 @@ export class SignallingManager {
             message = JSON.parse(e.data);
             
             switch(message.type) {
-                case "error":
-                    this.dynamicHTML.showPopup(message.message);
-                    this.ptzController.enable(false);
-                    break;
                 case "presets":
                     this.cameraManager.displayPresets(message.data);
                     this.ptzController.enable(true);

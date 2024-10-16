@@ -17,11 +17,13 @@ class AppState:
     def  __init__(self):
         self.cameras: Dict[str, Camera] = {}
         self.clients: Dict[str, ClientData] = {}
-        self.client_camera_connections: Dict[str, List[str]] = {}  # Client ID to list of Camera IDs
+        self.client_camera_connections: Dict[str, List[str]] = {}  # Client ID, Camera ID's
         self.connection_manager: ConnectionManager = ConnectionManager(self)
         self.status_data: Dict = {}
         self.camera_data: List = []
-        self.heartbeat_interval = 5  # seconds -> update to 60s when moving to production
+        self.heartbeat_interval = 5  #seconds
+
+    # Dictionary Functions
 
     async def add_camera(self, camera_id: str, camera: Camera):
         self.cameras[camera_id] = Camera(camera_id, camera)
@@ -40,6 +42,9 @@ class AppState:
         
         if client_id in self.clients:
             del self.clients[client_id]
+
+
+    # Update Status Functions
 
     async def update_status_data(self): 
         new_status_data = {}
@@ -89,3 +94,9 @@ class AppState:
             client.datachannel.send(heartbeat_message)
         except Exception as e:
             print(f"Error sending initial data to client {client.peer_connection.client_id}: {str(e)}")
+    #Upon Initial Connection Client Sends Server a DC message confirming connection.
+    #Server responds with Camera Info and Heartbeat Data.
+    #Client Sends back which Camera its connected to
+    #Server sends back PTZ data for that camera
+    #Client updates camera log? I dont fucking know. 
+

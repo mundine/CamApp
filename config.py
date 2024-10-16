@@ -23,13 +23,6 @@ Cameras = {
         'ptz_port': 80,
         'rtsp_port': 554,
     },
-    'West 2': {
-        'user': WEST2_USER,
-        'password': WEST2_PASS,
-        'ip': '10.20.64.159',
-        'ptz_port': 80,
-        'rtsp_port': 554,
-    },
     'East 2': {
         'user': EAST2_USER,
         'password': EAST2_PASS,

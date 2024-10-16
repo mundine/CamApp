@@ -7,7 +7,8 @@ class ConnectionManager:
         self.connection_queue: asyncio.Queue = asyncio.Queue()
         self.appstate = appstate
      
-    # Cameras Methods
+    
+    
     async def queue_camera_connection(self, peer_connection: CustomRTCPeerConnection, camera_id: str):          
         await self.connection_queue.put((peer_connection, camera_id))
         if peer_connection:

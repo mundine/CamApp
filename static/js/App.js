@@ -14,7 +14,8 @@ class App {
             this.dynamicHTML
         );
         this.ptzController.connectionManager = this.signallingManager; // Set the connection manager for PTZController
-        this.connectStream = this.connectStream.bind(this);
+        this.connectStream = this.throttle(this.connectStream.bind(this), 0);
+        this.lastConnectTime = 0;
     }
 
     init() {
@@ -25,6 +26,18 @@ class App {
         console.log("Connecting to stream:", name);
         this.ptzController.setActiveCamera(name);
         this.signallingManager.connectStream(name);
+    }
+
+    throttle(func, limit) {
+        return function(...args) {
+            const now = Date.now();
+            if (now - this.lastConnectTime >= limit) {
+                func.apply(this, args);
+                this.lastConnectTime = now;
+            } else {
+                console.log("Connection attempt throttled. Please wait.");
+            }
+        }.bind(this);
     }
 
     createNewPreset() {
