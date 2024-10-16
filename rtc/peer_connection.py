@@ -28,6 +28,8 @@ class CustomRTCPeerConnection(RTCPeerConnection):
         self.error_callback = None
         self.connection_complete = asyncio.Event()
         self.client_id = None
+        self.camera_id = None
+        self.datachannel = None
         
     def addTrack(self, track):
         sender = super().addTrack(track)

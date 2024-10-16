@@ -8,7 +8,6 @@ from onvif import ONVIFCamera
 
 # Local Application Imports
 from camera.camera_config import CameraConfig
-from client.client import ClientData
 
 class CameraController:
     def __init__(self, config: CameraConfig) -> None:
@@ -19,7 +18,7 @@ class CameraController:
         self.token = self.profile.token
 
 
-    def handle_ptz_command(self, command: Dict, client: ClientData) -> Dict:
+    def handle_ptz_command(self, command: Dict) -> Dict:
         if command['command'] == 'move':
             self.move(command['x'], command['y'], command['zoom'])
         elif command['command'] == 'stop':

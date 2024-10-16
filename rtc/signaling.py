@@ -10,28 +10,27 @@ from aiortc import RTCSessionDescription
 # Local application imports
 from app_state import AppState
 from .peer_connection import CustomRTCPeerConnection
-from camera.camera import Camera
 
 def create_offer_handler(app: AppState):
     async def offer(request):
         params = await request.json()
         pc = CustomRTCPeerConnection()
         pc.client_id = str(uuid.uuid4())
+        pc.camera_id = params.get('stream')
 
         @pc.on("connectionstatechange")
         async def on_connectionstatechange():
             print(f"Connection state changed to: {pc.connectionState}")
             if pc.connectionState == "connected":
-                await app.add_client(pc)
+                await app.client_manager.add_client(pc)
                 
             elif pc.connectionState in ["closed", "failed", "disconnected"]:
-                await app.remove_client(pc)
+                await app.client_manager.remove_client(pc)
         
         @pc.on("datachannel")
         async def on_datachannel(channel):
-            client = app.clients[pc.client_id]
-            client.datachannel = channel
-            asyncio.create_task(app.send_initial_data(client))
+            pc.datachannel = channel
+            asyncio.create_task(app.send_initial_data(pc))
 
             @channel.on("message")
             def on_message(message):
@@ -46,13 +45,10 @@ def create_offer_handler(app: AppState):
                         
                 except json.JSONDecodeError:
                     print("Error decoding message")
-                            
-        stream = params.get('stream')
-        print(f"Requested stream: {stream}")
 
-        if stream:
+        if pc.camera_id:
             try:
-                await app.connection_manager.queue_camera_connection(pc, stream)
+                await app.connection_manager.queue_camera_connection(pc)
             except ValueError as e:
                 print(f"Error connecting to camera: {e}")
         

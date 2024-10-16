@@ -21,7 +21,7 @@ def signal_handler(signum, frame):
 
 async def setup_cameras(app: AppState, cameras: Dict):
     for id, camera_info in cameras.items():
-        await app.add_camera(id, camera_info)
+        await app.camera_manager.add_camera(id, camera_info)
 
 def main():
     app = AppState()
