@@ -21,6 +21,9 @@ export default class CameraManager {
             const button = this.dynamicHTML.createPresetButton(preset);
             presetContainer.appendChild(button);
         });
+
+        const newPresetButton = this.dynamicHTML.createNewPresetButton();
+        presetContainer.appendChild(newPresetButton);
     }
 
     updateCameraStatus(cameraName, viewers, health) {

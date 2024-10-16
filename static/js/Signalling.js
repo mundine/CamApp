@@ -68,6 +68,12 @@ export class SignallingManager {
                 case "camera_info":
                     this.cameraManager.displayCameras(message.data);
                     break;
+                case "preset_created":
+                    this.handlePresetCreated(message);
+                    break;
+                case "preset_deleted":
+                    this.handlePresetDeleted(message);
+                    break;
             }
         };
     }
@@ -104,6 +110,26 @@ export class SignallingManager {
             for (const [cameraName, cameraData] of Object.entries(data)) {
                 this.cameraManager.updateCameraStatus(cameraName, cameraData.clients, cameraData.status);
             }
+        }
+    }
+
+    handlePresetCreated(message) {
+        if (message.success) {
+            alert(`Preset "${message.name}" created successfully!`);
+            // Refresh the presets list
+            this.ptzController.getPresets();
+        } else {
+            alert(`Failed to create preset: ${message.error}`);
+        }
+    }
+
+    handlePresetDeleted(message) {
+        if (message.success) {
+            alert(`Preset deleted successfully!`);
+            // Refresh the presets list
+            this.ptzController.getPresets();
+        } else {
+            alert(`Failed to delete preset: ${message.error}`);
         }
     }
 }

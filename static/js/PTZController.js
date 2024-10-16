@@ -42,6 +42,24 @@ export default class PTZController {
         }));
     }
 
+    createNewPreset(presetName) {
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "create_preset",
+            camera: this.activeCamera,
+            name: presetName
+        }));
+    }
+
+    deletePreset(presetToken) {
+        this.connectionManager.dataChannel.send(JSON.stringify({
+            type: 'ptz',
+            command: "delete_preset",
+            camera: this.activeCamera,
+            preset: presetToken
+        }));
+    }
+
     enable(en) {
         const ptzButtons = document.querySelectorAll('.flex.items-center.justify-center.text-sm.font-medium.hover\\:bg-muted.h-10.w-10.-m-px');
         
@@ -53,4 +71,7 @@ export default class PTZController {
             }
         });
     }
+
+    
+
 }

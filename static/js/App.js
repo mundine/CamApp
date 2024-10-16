@@ -26,6 +26,19 @@ class App {
         this.ptzController.setActiveCamera(name);
         this.signallingManager.connectStream(name);
     }
+
+    createNewPreset() {
+        const presetName = prompt("Enter a name for the new preset:");
+        if (presetName) {
+            this.ptzController.createNewPreset(presetName);
+        }
+    }
+
+    deletePreset(presetToken) {
+        if (confirm("Are you sure you want to delete this preset?")) {
+            this.ptzController.deletePreset(presetToken);
+        }
+    }
 }
 
 const app = new App();
@@ -36,3 +49,5 @@ window.connectStream = (name) => app.connectStream(name);
 window.ptzMove = (x, y, zoom) => app.ptzController.move(x, y, zoom);
 window.ptzStop = () => app.ptzController.stop();
 window.ptzGotoPreset = (preset) => app.ptzController.gotoPreset(preset);
+window.createNewPreset = () => app.createNewPreset();
+window.deletePreset = (presetToken) => app.deletePreset(presetToken);

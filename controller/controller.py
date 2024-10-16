@@ -1,7 +1,7 @@
 # Standard Library Imports
 from datetime import timedelta
 from typing import Dict
-import json
+
 
 # Third Party Imports
 from onvif import ONVIFCamera
@@ -19,7 +19,7 @@ class CameraController:
         self.token = self.profile.token
 
 
-    def handle_ptz_command(self, command: Dict, client: ClientData) -> None:
+    def handle_ptz_command(self, command: Dict, client: ClientData) -> Dict:
         if command['command'] == 'move':
             self.move(command['x'], command['y'], command['zoom'])
         elif command['command'] == 'stop':
@@ -28,7 +28,14 @@ class CameraController:
             self.goto_preset(command['preset'])
         elif command['command'] == 'get_presets':
             presets = self.get_presets()
-            client.datachannel.send(json.dumps({'type': 'presets', 'data': presets}))
+            return {'type': 'presets', 'data': presets}
+        elif command['command'] == 'create_preset':
+            result = self.create_preset(command['name'])
+            return {'type': 'preset_created', 'success': result['success'], 'name': command['name'], 'error': result.get('error')}
+        elif command['command'] == 'delete_preset':
+            result = self.delete_preset(command['preset'])
+            return {'type': 'preset_deleted', 'success': result['success'], 'error': result.get('error')}
+        return None
 
     def move(self, x: float, y: float, zoom: float) -> None:
         request = self.ptz_service.create_type('ContinuousMove')
@@ -54,3 +61,24 @@ class CameraController:
     def get_presets(self) -> list:
         presets = self.ptz_service.GetPresets({'ProfileToken': self.token})
         return [{'token': preset.token, 'name': preset.Name} for preset in presets]
+    
+    def create_preset(self, name: str) -> Dict:
+        try:
+            request = self.ptz_service.create_type('SetPreset')
+            request.ProfileToken = self.token
+            request.PresetName = name
+            response = self.ptz_service.SetPreset(request)
+            print(response)
+            return {'success': True, 'token': response}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    def delete_preset(self, preset_token: str) -> Dict:
+        try:
+            request = self.ptz_service.create_type('RemovePreset')
+            request.ProfileToken = self.token
+            request.PresetToken = preset_token
+            self.ptz_service.RemovePreset(request)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}

@@ -40,7 +40,9 @@ def create_offer_handler(app: AppState):
                     print(f"Received message: {data}")
                     if data['type'] == 'ptz':
                         client = app.clients[pc.client_id]
-                        app.cameras[data['camera']].controller.handle_ptz_command(data, client)
+                        result = app.cameras[data['camera']].controller.handle_ptz_command(data, client)
+                        if result:
+                            channel.send(json.dumps(result))
                         
                 except json.JSONDecodeError:
                     print("Error decoding message")
@@ -50,7 +52,7 @@ def create_offer_handler(app: AppState):
 
         if stream:
             try:
-                await app.connection_manager.connect_peer_to_camera(pc, stream)
+                await app.connection_manager.queue_camera_connection(pc, stream)
             except ValueError as e:
                 print(f"Error connecting to camera: {e}")
         

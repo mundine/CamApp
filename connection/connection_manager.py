@@ -9,7 +9,7 @@ class ConnectionManager:
      
     # Cameras Methods
     async def queue_camera_connection(self, peer_connection: CustomRTCPeerConnection, camera_id: str):          
-        self.connection_queue.put((peer_connection, camera_id))
+        await self.connection_queue.put((peer_connection, camera_id))
         if peer_connection:
             await peer_connection.connection_complete.wait()
 
@@ -44,7 +44,7 @@ class ConnectionManager:
         while True:
             try:
                 peer_connection, camera_id = await self.connection_queue.get()                
-                camera = self.cameras.get(camera_id)
+                camera = self.appstate.cameras.get(camera_id)
                 
                 if camera:
                     await self.connect_peer_to_camera(peer_connection, camera_id)

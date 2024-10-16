@@ -39,8 +39,11 @@ export default class DynamicHTML {
     }
 
     createPresetButton(preset) {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = "flex items-center w-full";
+
         const button = document.createElement('button');
-        button.className = "flex items-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-muted h-10 px-4 py-2 w-full justify-start gap-2";
+        button.className = "flex items-center whitespace-nowrap rounded-l-md text-sm font-medium hover:bg-muted h-10 px-4 py-2 flex-grow justify-start gap-2";
         
         const icon = document.createElement('i');
         icon.className = "bi bi-easel text-muted-foreground";
@@ -51,6 +54,38 @@ export default class DynamicHTML {
         button.appendChild(text);
 
         button.onclick = () => window.ptzGotoPreset(preset.token);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = "flex items-center justify-center rounded-r-md text-sm font-medium bg-muted-500 text-white hover:bg-red-600 h-10 w-10";
+        deleteButton.onclick = (e) => {
+            e.stopPropagation();
+            window.deletePreset(preset.token);
+        };
+
+        const deleteIcon = document.createElement('i');
+        deleteIcon.className = "bi bi-x-lg";
+        deleteButton.appendChild(deleteIcon);
+
+        buttonContainer.appendChild(button);
+        buttonContainer.appendChild(deleteButton);
+
+        return buttonContainer;
+    }
+
+    createNewPresetButton() {
+        const button = document.createElement('button');
+        button.className = "flex items-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-muted text-white h-10 px-4 py-2 w-full justify-center gap-2";
+        button.id = "new-preset-button";
+        
+        const icon = document.createElement('i');
+        icon.className = "bi bi-plus-circle";
+        icon.style.fontSize = "1.2rem";
+        button.appendChild(icon);
+
+        const text = document.createTextNode("New Preset");
+        button.appendChild(text);
+
+        button.onclick = () => window.createNewPreset();
         return button;
     }
 }
