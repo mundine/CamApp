@@ -8,7 +8,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 # Configure root logger
 root_logger = logging.getLogger()
-root_logger.setLevel(logging.ERROR)
+root_logger.setLevel(logging.INFO)
 
 # Create formatters
 file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

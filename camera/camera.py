@@ -1,6 +1,5 @@
 # Standard Library Imports
-from typing import Optional, Dict
-from concurrent.futures import ThreadPoolExecutor
+from typing import Optional, Dict, Set
 import asyncio
 import socket
 import av
@@ -14,7 +13,7 @@ from aiortc.contrib.media import MediaRelay, MediaPlayer
 #Local Application Imports
 from controller.controller import CameraController
 from camera.camera_config import CameraConfig, CameraState  
-
+from rtc.peer_connection import CustomRTCPeerConnection
 class Camera:
     def __init__(self, camera_name: str, camera_data: Dict[str, str]):
         self.name = camera_name
@@ -22,8 +21,7 @@ class Camera:
         self.state = CameraState.OFFLINE
         self.player: Optional[MediaStreamTrack] = None
         self.relay: Optional[MediaRelay] = None
-        self.clients: int = 0
-        self.executor: ThreadPoolExecutor = ThreadPoolExecutor(max_workers=5)
+        self.clients: Set[CustomRTCPeerConnection] = set()
         self.controller: Optional[CameraController] = None
 
     async def start(self):
@@ -37,16 +35,11 @@ class Camera:
             self.state = CameraState.ONLINE
             self.controller = CameraController(self.config)
         except asyncio.TimeoutError:
-            logging.error(f"Timeout while connecting to camera {self.name}")
-            self.state = CameraState.UNAVAILABLE
+            await self._handle_error("Timeout while connecting to camera")
         except av.error.ExitError as e:
-            logging.error(f"ExitError for camera {self.name}: {str(e)}")
-            await self.stop()
-            self.state = CameraState.UNAVAILABLE
+            await self._handle_error(f"ExitError: {str(e)}")
         except Exception as e:
-            logging.error(f"Unexpected error starting camera {self.name}: {str(e)}")
-            await self.stop()
-            self.state = CameraState.UNAVAILABLE
+            await self._handle_error(f"Unexpected error: {str(e)}")
 
     async def stop(self):
         self.state = CameraState.OFFLINE
@@ -77,3 +70,8 @@ class Camera:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.stop()
+
+    async def _handle_error(self, error_message):
+        logging.error(f"{self.name}: {error_message}")
+        await self.stop()
+        self.state = CameraState.UNAVAILABLE

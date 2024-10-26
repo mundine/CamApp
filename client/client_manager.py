@@ -16,7 +16,10 @@ class ClientManager:
         self.clients.add(client)
 
     async def remove_client(self, client: CustomRTCPeerConnection):
-        self.clients.remove(client) 
+        try:
+            self.clients.remove(client) 
+        except Exception as e:
+            logger.error(f"Failed to remove client {client.client_id}: {str(e)}")
 
     async def send_message_to_client(self, client: CustomRTCPeerConnection, message: str):
         try:
@@ -37,4 +40,4 @@ class ClientManager:
         return len(self.clients)
 
     async def get_client_by_camera_id(self, camera_id: str):
-        return [client for client in self.clients if camera_id in client.camera_ids]
+        return [client for client in self.clients if camera_id == client.camera_id]

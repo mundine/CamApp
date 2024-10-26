@@ -14,7 +14,7 @@ class App {
             this.dynamicHTML
         );
         this.ptzController.connectionManager = this.signallingManager; // Set the connection manager for PTZController
-        this.connectStream = this.throttle(this.connectStream.bind(this), 0);
+        this.connectStream = this.throttle(this.connectStream.bind(this), 5000);
         this.lastConnectTime = 0;
     }
 

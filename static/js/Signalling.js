@@ -31,11 +31,19 @@ export class SignallingManager {
                     })
                 });
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(answer => {
                 return this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error in createConnection:', error);
+                // Consider implementing a retry mechanism or user notification here
+            });
         this.initializeEventListeners();
     }
 

@@ -59,11 +59,12 @@ class Server:
         else:
             raise web.HTTPTooManyRequests(text="Rate limit exceeded")
 
-    async def shutdown(self):
+    async def shutdown(self, app):
         logger.info("Shutting down server...")
-        await self.cleanup_background_tasks(self.web_app)
-        for client in self.app.clients:
-            await client.peer_connection.close()
+        await self.cleanup_background_tasks(app)
+        for client in self.app.client_manager.clients:
+            await client.close()
+        # Consider adding any other necessary cleanup steps here
         logger.info("Server shutdown complete.")
 
     async def start_background_tasks(self, app):
@@ -73,7 +74,8 @@ class Server:
 
     async def cleanup_background_tasks(self, app):
         logger.info("Cleaning up background tasks")
-        for task in [self.process_connections_task, self.heartbeat_task]:
+        tasks = [self.process_connections_task, self.heartbeat_task]
+        for task in tasks:
             if task:
                 task.cancel()
                 try:
