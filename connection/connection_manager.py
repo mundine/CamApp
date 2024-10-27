@@ -34,6 +34,7 @@ class ConnectionManager:
                         await camera_start_task
                     
                     track = await asyncio.to_thread(camera.relay.subscribe, camera.player)
+                    print(camera.config)
                     peer_connection.addTrack(track)
                     peer_connection.connection_complete.set()
                     

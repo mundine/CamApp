@@ -44,7 +44,7 @@ def main():
         logger.info("Keyboard interrupt received. Shutting down...")
     finally:
         logger.info("Cleaning up...")
-        loop.run_until_complete(server.shutdown())
+        loop.run_until_complete(server.shutdown(app))
         loop.close()
 
 if __name__ == "__main__":
