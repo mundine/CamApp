@@ -35,6 +35,7 @@ class App {
                 func.apply(this, args);
                 this.lastConnectTime = now;
             } else {
+                alert("Connection attempt throttled. Please wait 5 seconds.");
                 console.log("Connection attempt throttled. Please wait.");
             }
         }.bind(this);
