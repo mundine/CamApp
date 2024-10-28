@@ -2,7 +2,6 @@
 from datetime import timedelta
 from typing import Dict
 
-
 # Third Party Imports
 from onvif import ONVIFCamera
 
@@ -10,7 +9,12 @@ from onvif import ONVIFCamera
 from camera.camera_config import CameraConfig
 
 class CameraController:
+    """
+    Controls the PTZ (Pan-Tilt-Zoom) functionality of a camera.
+    Interacts with the ONVIF protocol to send commands to the camera.
+    """
     def __init__(self, config: CameraConfig) -> None:
+        
         self.ptz = ONVIFCamera(config.ip, config.ptz_port, config.user, config.password)
         self.ptz_service = self.ptz.create_ptz_service()
         self.media_service = self.ptz.create_media_service()
@@ -19,6 +23,12 @@ class CameraController:
 
 
     def handle_ptz_command(self, command: Dict) -> Dict:
+        """
+        Handles incoming PTZ commands and executes the appropriate action.
+
+        :param command: The command dictionary containing the action and parameters.
+        :return: A response dictionary with the result of the command.
+        """
         if command['command'] == 'move':
             self.move(command['x'], command['y'], command['zoom'])
         elif command['command'] == 'stop':

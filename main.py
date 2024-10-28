@@ -24,6 +24,10 @@ async def setup_cameras(app: AppState, cameras: Dict):
         await app.camera_manager.add_camera(id, camera_info)
 
 def main():
+    """
+    The main entry point of the application.
+    Initializes the application state, sets up the server, and starts the event loop.
+    """
     app = AppState()
     server = Server(app)
     

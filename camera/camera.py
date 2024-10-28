@@ -15,6 +15,10 @@ from controller.controller import CameraController
 from camera.camera_config import CameraConfig, CameraState  
 from rtc.peer_connection import CustomRTCPeerConnection
 class Camera:
+    """
+    Represents a camera with its configuration and state.
+    Manages the camera's lifecycle, including starting and stopping the stream.
+    """
     def __init__(self, camera_name: str, camera_data: Dict[str, str]):
         self.name = camera_name
         self.config = CameraConfig.from_dict(camera_data)
@@ -25,6 +29,9 @@ class Camera:
         self.controller: Optional[CameraController] = None
 
     async def start(self):
+        """
+        Starts the camera stream and initializes the media player.
+        """
         try:
             player = await asyncio.wait_for(
                 asyncio.to_thread(MediaPlayer, self.config.rtsp_url, format="rtsp"),
@@ -42,6 +49,9 @@ class Camera:
             await self._handle_error(f"Unexpected error: {str(e)}")
 
     async def stop(self):
+        """
+        Stops the camera stream and releases resources.
+        """
         self.state = CameraState.OFFLINE
         if self.player:
             await asyncio.to_thread(self.player.stop)
@@ -50,19 +60,24 @@ class Camera:
         self.controller = None
 
     async def check_health(self):
-            parsed_url = urlparse(self.config.rtsp_url)
-            host = parsed_url.hostname
-            port = parsed_url.port or 554
-            
-            try:
-                _, _ = await asyncio.wait_for(
-                    asyncio.open_connection(host, port),
-                    timeout=1.0
-                )
-                self.state = CameraState.OFFLINE
-            except (asyncio.TimeoutError, ConnectionRefusedError, socket.gaierror):
-                self.state = CameraState.UNAVAILABLE
-   
+        """
+        Checks the health of the camera by attempting to connect to its RTSP stream.
+        Updates the camera state based on the connection result.
+        Intended to prevent clients from trying to connect to an unavailable camera. 
+        """
+        parsed_url = urlparse(self.config.rtsp_url)
+        host = parsed_url.hostname
+        port = parsed_url.port or 554
+        
+        try:
+            _, _ = await asyncio.wait_for(
+                asyncio.open_connection(host, port),
+                timeout=1.0
+            )
+            self.state = CameraState.OFFLINE
+        except (asyncio.TimeoutError, ConnectionRefusedError, socket.gaierror):
+            self.state = CameraState.UNAVAILABLE
+
 
     async def __aenter__(self):
         await self.start()

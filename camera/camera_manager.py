@@ -4,6 +4,9 @@ from camera.camera import Camera, CameraState
 
 
 class CameraManager:
+    """
+    Manages multiple cameras, including adding, removing, and updating their status.
+    """
     def __init__(self, app_state):
         self.app_state = app_state
         self.cameras: Dict[str, Camera] = {}
@@ -11,10 +14,19 @@ class CameraManager:
         
 
     async def add_camera(self, camera_id: str, camera_data: Dict[str, str]):
+        """
+        Adds a new camera to the manager. Called on application startup based on cameras stored in Config.py
+
+        :param camera_id: The unique identifier for the camera.
+        :param camera_data: The configuration data for the camera.
+        """
         self.cameras[camera_id] = Camera(camera_id, camera_data) 
         
 
     async def update_status_data(self): 
+        """
+        Updates the status of all managed cameras and checks their health.
+        """
         new_status_data = {}
         for camera_id, camera in self.cameras.items():
             if  camera.state == CameraState.ONLINE and len(camera.clients) == 0:

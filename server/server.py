@@ -15,6 +15,9 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class RateLimiter:
+    """
+    Rate limiting of html requests. Prevents someone from spam connecting potentially breaking program. 
+    """
     def __init__(self, rate_limit, time_period):
         self.rate_limit = rate_limit
         self.time_period = time_period
@@ -31,6 +34,9 @@ class RateLimiter:
         return True
 
 class Server:
+    """
+    Represents the web server that handles incoming requests and manages the application.
+    """
     def __init__(self, app: AppState):
         self.web_app = web.Application()
         self.app = app
@@ -39,6 +45,9 @@ class Server:
         self.heartbeat_task = None
 
     async def setup(self):
+        """
+        Sets up the server routes and middleware.
+        """
         self.web_app.router.add_get("/", index)
         self.web_app.router.add_get("/{filename}.js", javascript)
         self.web_app.router.add_get('/static/{filename}', static_files)
@@ -60,6 +69,11 @@ class Server:
             raise web.HTTPTooManyRequests(text="Rate limit exceeded")
 
     async def shutdown(self, app):
+        """
+        Shuts down the server and cleans up resources.
+
+        :param app: The application state to clean up.
+        """
         logger.info("Shutting down server...")
         await self.cleanup_background_tasks(app)
         for client in self.app.client_manager.clients:

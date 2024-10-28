@@ -1,7 +1,12 @@
+# Standard library Imports
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Configuration file for loading environment variables and camera settings.
+# Uses dotenv to load credentials from a .env file.
+# Update .env file locally on CLBPRDAPP02 as it is not saved in git repo. 
 
 # Environment variables for camera credentials
 CENTRAL_USER = os.environ.get('CENTRAL_USER')

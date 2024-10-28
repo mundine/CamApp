@@ -5,17 +5,31 @@ from camera.camera_config import CameraState
 
 
 class ConnectionManager:
+    """
+    Manages the connections between clients and cameras.
+    Handles queuing of connection requests and processing them.
+    """
     def __init__(self, appstate):
         self.connection_queue: asyncio.Queue = asyncio.Queue()
         self.appstate = appstate
         self.logger = logging.getLogger(__name__)
     
-    async def queue_camera_connection(self, peer_connection: CustomRTCPeerConnection):          
+    async def queue_camera_connection(self, peer_connection: CustomRTCPeerConnection):   
+        """
+        Queues a camera connection request using the asyncio .put function.
+
+        :param peer_connection: The peer connection object representing the client.
+        """       
         await self.connection_queue.put((peer_connection))
         if peer_connection:
             await peer_connection.connection_complete.wait()
 
     async def connect_client_to_camera(self, peer_connection: CustomRTCPeerConnection):
+        """
+        Connects a client to a specified camera.
+
+        :param peer_connection: The peer connection object representing the client.
+        """
         camera_id = peer_connection.camera_id
         camera = self.appstate.camera_manager.cameras[camera_id]
     
@@ -32,9 +46,8 @@ class ConnectionManager:
                 async with asyncio.timeout(10):  # 10-second timeout
                     if camera_start_task:
                         await camera_start_task
-                    
+
                     track = await asyncio.to_thread(camera.relay.subscribe, camera.player)
-                    print(camera.config)
                     peer_connection.addTrack(track)
                     peer_connection.connection_complete.set()
                     
@@ -49,6 +62,10 @@ class ConnectionManager:
             
     # Connection Processing 
     async def process_connections(self):
+        """
+        Continuously processes connection requests from the queue.
+        Creates tasks for each connection request to handle them concurrently.
+        """
         while True:
             try:
                 peer_connection = await self.connection_queue.get()

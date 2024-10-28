@@ -1,6 +1,7 @@
+# Standard Library Imports
 import logging
-import os
 from logging.handlers import RotatingFileHandler
+import os
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
@@ -47,7 +48,7 @@ def get_logger(name):
     """
     Get a logger with the specified name.
     
-    :param name: The name of the logger (usually __name__)
+    :param name: The name of the logger ( __name__)
     :return: A configured logger instance
     """
     return logging.getLogger(name)

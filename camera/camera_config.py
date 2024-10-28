@@ -5,6 +5,9 @@ from typing import Dict
 
 @dataclass
 class CameraConfig:
+    """
+    Configuration data for a camera, including credentials and connection details.
+    """
     user: str
     password: str
     ip: str
@@ -26,6 +29,9 @@ class CameraConfig:
         )
 
 class CameraState(Enum):
+    """
+    Enumeration representing the possible states of a camera.
+    """
     OFFLINE = 0
     ONLINE = 1
     UNAVAILABLE = 2
