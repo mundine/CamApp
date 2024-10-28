@@ -11,7 +11,7 @@
    - [Starting the Server](#starting-the-server)
    - [Accessing the Web Interface](#accessing-the-web-interface)
    - [Troubleshooting](#troubleshooting)
-4. [Project Structure](#project-structure)
+
 
 
 ## Introduction
@@ -97,58 +97,6 @@ For advanced configuration options or to modify the application behavior, you ma
 - If the camera is not visible in the list, check the IP address and credentials in the `.env` file.
 - Ensure that the camera IP addresses and credentials in the configuration are correct.
 
-
-## Project Structure
-│
-├── camera/
-│ ├── camera.py
-│ └── camera_config.py
-│
-├── client/
-│ └── client.py
-│
-├── connection/
-│ ├── connection_manager.py
-│ └── interfaces.py
-│
-├── controller/
-│ └── controller.py
-│
-├── rtc/
-│ ├── peer_connection.py
-│ └── signaling.py
-│
-├── server/
-│ ├── routes.py
-│ └── server.py
-│
-├── static/
-│ ├── js/
-│ │ ├── App.js
-│ │ ├── CameraManager.js
-│ │ ├── ConnectionManager.js
-│ │ ├── DynamicHTML.js
-│ │ ├── PTZController.js
-│ │ └── signalling.js
-│ │
-│ ├── templates/
-│ │ └── index.html
-│ │
-│ └── img/
-│
-├── tests/
-│ ├── test_app_state.py
-│ ├── test_camera.py
-│ └── test_camera_config.py
-│
-├── utils/
-│ └── logger.py
-│
-├── .env
-├── app_state.py
-├── config.py
-├── main.py
-└── README.md
 
 ### Key Components:
 
