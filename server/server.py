@@ -8,7 +8,7 @@ from aiohttp import web
 
 # Local application imports
 from app_state import AppState
-from server.routes import index, javascript, static_files
+from server.routes import index, javascript, static_files, multiview
 from rtc.signaling import create_offer_handler
 from utils.logger import get_logger
 
@@ -49,6 +49,7 @@ class Server:
         Sets up the server routes and middleware.
         """
         self.web_app.router.add_get("/", index)
+        self.web_app.router.add_get("/multiview", multiview)
         self.web_app.router.add_get("/{filename}.js", javascript)
         self.web_app.router.add_get('/static/{filename}', static_files)
         self.web_app.router.add_post("/offer", create_offer_handler(self.app))

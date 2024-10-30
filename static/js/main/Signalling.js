@@ -44,7 +44,7 @@ export class SignallingManager {
                 console.error('Error in createConnection:', error);
                 // Consider implementing a retry mechanism or user notification here
             });
-        this.initializeEventListeners();
+        this.initializeEventListeners(this.streamLocal);
     }
 
     setupDataChannelListeners() {
@@ -91,12 +91,12 @@ export class SignallingManager {
         this.createConnection();
     }
 
-    initializeEventListeners() {
+    initializeEventListeners(streamLocal) {
         console.log("Initializing event listeners");
         console.log(this.peerConnection.dataChannel)
         this.peerConnection.addEventListener("track", (e) => {
             console.log("Track");
-            document.getElementById('video').srcObject = e.streams[0];
+            document.getElementById(streamLocal + '-video').srcObject = e.streams[0];
         });
 
         this.peerConnection.onconnectionstatechange = (e) => {

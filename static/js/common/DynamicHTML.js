@@ -88,4 +88,65 @@ export default class DynamicHTML {
         button.onclick = () => window.createNewPreset();
         return button;
     }
+
+    createVideoContainer(streamLocal) {
+        const containerDiv = document.createElement('div');
+        containerDiv.id = `${streamLocal}-container`;
+        containerDiv.className = 'relative w-full h-0 pb-[56.25%] opacity-50';
+
+        const video = document.createElement('video');
+        video.id = `${streamLocal}-video`;
+        video.className = 'absolute top-0 left-0 w-full h-full';
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+
+        // Create unavailable message overlay
+        const unavailableOverlay = document.createElement('div');
+        unavailableOverlay.id = `${streamLocal}-unavailable`;
+        unavailableOverlay.className = 'absolute inset-0 flex items-center justify-center bg-black/50 text-white text-lg font-medium';
+        unavailableOverlay.textContent = 'Camera Unavailable';
+
+        video.addEventListener('loadeddata', () => {
+            containerDiv.className = 'relative w-full h-0 pb-[56.25%] cursor-pointer';
+            containerDiv.onclick = () => {
+                const healthElement = document.getElementById(`${streamLocal}-health`);
+                if (healthElement && healthElement.textContent !== 'Unavailable') {
+                    window.setActiveCamera(streamLocal);
+                }
+            };
+        });
+
+        const activeIndicator = document.createElement('div');
+        activeIndicator.id = `${streamLocal}-active`;
+        activeIndicator.className = 'absolute top-2 right-2 w-3 h-3 rounded-full bg-green-500 hidden';
+
+        const label = document.createElement('div');
+        label.className = 'absolute bottom-2 right-2 bg-black/50 px-2 py-1 rounded text-sm';
+        label.textContent = streamLocal;
+
+        const statusDiv = document.createElement('div');
+        statusDiv.id = `${streamLocal}-status`;
+        statusDiv.className = 'absolute bottom-10 right-2 bg-black/50 px-2 py-1 rounded text-sm';
+        statusDiv.textContent = 'Viewer(s): ';
+        
+        const viewersSpan = document.createElement('span');
+        viewersSpan.id = `${streamLocal}-viewers`;
+        viewersSpan.textContent = '0';
+        statusDiv.appendChild(viewersSpan);
+        statusDiv.appendChild(document.createTextNode(' | Status: '));
+        
+        const healthSpan = document.createElement('span');
+        healthSpan.id = `${streamLocal}-health`;
+        healthSpan.textContent = 'Unknown';
+        statusDiv.appendChild(healthSpan);
+
+        containerDiv.appendChild(video);
+        containerDiv.appendChild(unavailableOverlay);
+        containerDiv.appendChild(activeIndicator);
+        containerDiv.appendChild(label);
+        containerDiv.appendChild(statusDiv);
+        
+        return containerDiv;
+    }
 }

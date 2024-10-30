@@ -58,6 +58,7 @@ def create_offer_handler(app: AppState):
 
             @channel.on("message")
             def on_message(message):
+                print(message)
                 try:
                     data = json.loads(message)
                     logger.debug(f"Received message: {data}")

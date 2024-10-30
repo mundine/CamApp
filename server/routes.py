@@ -19,6 +19,17 @@ async def index(request):
         content = file.read()
     return web.Response(content_type="text/html", text=content)
 
+async def multiview(request):
+    """
+    Serves the multiview HTML page for the application.
+
+    :param request: The HTTP request object.
+    :return: An HTTP response containing the HTML content.
+    """
+    with open(os.path.join(ROOT, "static", "templates", "multiview.html"), "r") as file:
+        content = file.read()
+    return web.Response(content_type="text/html", text=content)
+
 async def javascript(request):
     """
     Serves JavaScript files for the application.
@@ -27,8 +38,17 @@ async def javascript(request):
     :return: An HTTP response containing the JavaScript content or a 404 error.
     """
     filename = request.match_info.get('filename')
-    filepath = os.path.join(ROOT, "static", "js", f"{filename}.js")
-    if os.path.exists(filepath):
+    # Search through the whole js structure
+    js_directories = ["common", "main", "multi"]
+    filepath = None
+
+    for directory in js_directories:
+        potential_path = os.path.join(ROOT, "static", "js", directory, f"{filename}.js")
+        if os.path.exists(potential_path):
+            filepath = potential_path
+            break
+
+    if filepath:
         with open(filepath, "r") as file:
             content = file.read()
         return web.Response(content_type="application/javascript", text=content)
