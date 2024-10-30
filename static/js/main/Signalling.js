@@ -96,7 +96,7 @@ export class SignallingManager {
         console.log(this.peerConnection.dataChannel)
         this.peerConnection.addEventListener("track", (e) => {
             console.log("Track");
-            document.getElementById(streamLocal + '-video').srcObject = e.streams[0];
+            document.getElementById('video').srcObject = e.streams[0];
         });
 
         this.peerConnection.onconnectionstatechange = (e) => {
